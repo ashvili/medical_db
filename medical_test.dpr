@@ -5,7 +5,8 @@ uses
   cardList in 'cardList.pas' {fmCardList},
   dmCardListUnit in 'dmCardListUnit.pas' {dmCard: TDataModule},
   cardEdit in 'cardEdit.pas' {fmCardEdit},
-  dmCardEditUnit in 'dmCardEditUnit.pas' {dmCardEdit: TDataModule};
+  dmCardEditUnit in 'dmCardEditUnit.pas' {dmCardEdit: TDataModule},
+  settings in 'settings.pas';
 
 {$R *.res}
 

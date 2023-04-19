@@ -11,39 +11,38 @@ object fmCardList: TfmCardList
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnCreate = FormCreate
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object cxPG: TcxPageControl
     Left = 0
-    Top = 89
+    Top = 115
     Width = 818
-    Height = 422
+    Height = 396
     Align = alClient
     TabOrder = 0
     Properties.ActivePage = cxTabSheet1
     Properties.CustomButtons.Buttons = <>
-    ExplicitLeft = 88
-    ExplicitTop = 104
-    ExplicitWidth = 289
-    ExplicitHeight = 193
-    ClientRectBottom = 418
+    ExplicitTop = 89
+    ExplicitHeight = 422
+    ClientRectBottom = 392
     ClientRectLeft = 4
     ClientRectRight = 814
     ClientRectTop = 24
     object cxTabSheet1: TcxTabSheet
+      Tag = -2
       Caption = #1057#1087#1080#1089#1086#1082' '#1082#1072#1088#1090
       ImageIndex = 0
+      ExplicitHeight = 394
       object cxGrid1: TcxGrid
         Left = 0
         Top = 0
         Width = 810
-        Height = 394
+        Height = 368
         Align = alClient
         TabOrder = 0
-        ExplicitLeft = 200
-        ExplicitTop = 128
-        ExplicitWidth = 250
-        ExplicitHeight = 200
+        ExplicitHeight = 394
         object cxGrid1DBTableView1: TcxGridDBTableView
           Navigator.Buttons.CustomButtons = <>
           Navigator.Buttons.First.Visible = True
@@ -122,31 +121,86 @@ object fmCardList: TfmCardList
   end
   object Panel1: TPanel
     Left = 0
-    Top = 0
+    Top = 26
     Width = 818
     Height = 89
     Align = alTop
     TabOrder = 1
+    ExplicitTop = 0
   end
-  object ActionList1: TActionList
+  object ActionToolBar1: TActionToolBar
+    Left = 0
+    Top = 0
+    Width = 818
+    Height = 26
+    ActionManager = ActionManager1
+    Caption = 'ActionToolBar1'
+    Color = clMenuBar
+    ColorMap.DisabledFontColor = 7171437
+    ColorMap.HighlightColor = clWhite
+    ColorMap.BtnSelectedFont = clBlack
+    ColorMap.UnusedColor = clWhite
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlack
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    Spacing = 0
+  end
+  object ActionManager1: TActionManager
+    ActionBars = <
+      item
+        Items = <
+          item
+            Action = aShow
+            ImageIndex = 0
+          end
+          item
+            Action = aEdit
+            ImageIndex = 3
+          end
+          item
+            Action = aNew
+            ImageIndex = 1
+          end
+          item
+            Action = aDelete
+            ImageIndex = 2
+          end
+          item
+            Action = aExit
+            ImageIndex = 5
+          end>
+        ActionBar = ActionToolBar1
+      end>
     Images = dmCard.cxImageList1
-    Left = 588
-    Top = 185
+    Left = 456
+    Top = 72
+    StyleName = 'IDE Theme Style'
     object aShow: TAction
       Caption = #1055#1086#1082#1072#1079#1072#1090#1100
       ImageIndex = 0
+      OnExecute = aShowExecute
     end
     object aEdit: TAction
-      Caption = #1056#1077#1076#1072#1082#1090#1080#1088#1086#1074#1072#1090#1100
+      Caption = #1048#1079#1084#1077#1085#1080#1090#1100
       ImageIndex = 3
+      OnExecute = aEditExecute
     end
     object aNew: TAction
       Caption = #1053#1086#1074#1072#1103' '#1082#1072#1088#1090#1072
       ImageIndex = 1
+      OnExecute = aNewExecute
     end
     object aDelete: TAction
-      Caption = #1059#1076#1072#1083#1080#1090#1100
+      Caption = #1059#1076#1072#1083#1080#1090#1100' '#1082#1072#1088#1090#1091
       ImageIndex = 2
+      OnExecute = aDeleteExecute
+    end
+    object aExit: TAction
+      Caption = #1042#1099#1093#1086#1076
+      ImageIndex = 5
     end
   end
 end

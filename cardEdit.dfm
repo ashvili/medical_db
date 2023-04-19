@@ -11,6 +11,7 @@ object fmCardEdit: TfmCardEdit
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnClose = FormClose
   PixelsPerInch = 96
   TextHeight = 13
 end

@@ -9,7 +9,6 @@ object dmCard: TdmCard
       'User_Name=postgres'
       'Password=postgres'
       'DriverID=PG')
-    Connected = True
     LoginPrompt = False
     Left = 56
     Top = 24
@@ -119,7 +118,7 @@ object dmCard: TdmCard
   object cxImageList1: TcxImageList
     SourceDPI = 96
     FormatVersion = 1
-    DesignInfo = 9961976
+    DesignInfo = 1048720
     ImageInfo = <
       item
         ImageClass = 'TdxPNGImage'

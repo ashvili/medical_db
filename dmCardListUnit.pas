@@ -34,8 +34,13 @@ type
     procedure qMedical_cardCalcFields(DataSet: TDataSet);
   private
     { Private declarations }
+    procedure openTables;
   public
     { Public declarations }
+    procedure init;
+
+    procedure openMedical_card;
+    procedure delete(id: integer);
   end;
 
 var
@@ -48,6 +53,27 @@ implementation
 uses StrUtils;
 
 {$R *.dfm}
+
+procedure TdmCard.delete(id: integer);
+begin
+
+end;
+
+procedure TdmCard.init;
+begin
+  qMedical_card.Open();
+end;
+
+procedure TdmCard.openMedical_card;
+begin
+  qMedical_card.Close;
+  qMedical_card.Open();
+end;
+
+procedure TdmCard.openTables;
+begin
+  openTables;
+end;
 
 procedure TdmCard.qMedical_cardCalcFields(DataSet: TDataSet);
 begin
