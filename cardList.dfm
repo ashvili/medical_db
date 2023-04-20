@@ -25,8 +25,6 @@ object fmCardList: TfmCardList
     TabOrder = 0
     Properties.ActivePage = cxTabSheet1
     Properties.CustomButtons.Buttons = <>
-    ExplicitTop = 57
-    ExplicitHeight = 454
     ClientRectBottom = 381
     ClientRectLeft = 4
     ClientRectRight = 968
@@ -35,7 +33,6 @@ object fmCardList: TfmCardList
       Tag = -2
       Caption = #1057#1087#1080#1089#1086#1082' '#1082#1072#1088#1090
       ImageIndex = 0
-      ExplicitHeight = 426
       object cxGrid1: TcxGrid
         Left = 0
         Top = 0
@@ -43,7 +40,6 @@ object fmCardList: TfmCardList
         Height = 357
         Align = alClient
         TabOrder = 0
-        ExplicitHeight = 426
         object cxGrid1DBTableView1: TcxGridDBTableView
           Navigator.Buttons.CustomButtons = <>
           Navigator.Buttons.First.Visible = True
@@ -179,7 +175,7 @@ object fmCardList: TfmCardList
     Width = 353
     Height = 74
     BevelOuter = bvNone
-    TabOrder = 6
+    TabOrder = 2
     object edFIO: TcxMRUEdit
       Left = 110
       Top = 2
@@ -342,8 +338,8 @@ object fmCardList: TfmCardList
           Visible = True
           ItemName = 'dxDelete_card'
         end>
-      OneOnRow = True
-      Row = 1
+      OneOnRow = False
+      Row = 0
       UseOwnFont = False
       Visible = True
       WholeRow = False
@@ -362,7 +358,7 @@ object fmCardList: TfmCardList
           Visible = True
           ItemName = 'dxLargeSave_card'
         end>
-      OneOnRow = True
+      OneOnRow = False
       Row = 0
       UseOwnFont = False
       Visible = True

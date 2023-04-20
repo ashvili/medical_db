@@ -178,14 +178,29 @@ end;
 procedure TfmCardList.deleteMedical_card;
 var
   i: integer;
+  id: integer;
 begin
   with dmCardList do begin
     if qMedical_card.Active and (qMedical_card.RecordCount > 0) then begin
       if MessageDlg('Удалить карту?', mtConfirmation, mbOKCancel, 0) <> mrOK then
         Exit;
-      i := findPage(qMedical_cardid.Value);
+
+      if cxPG.ActivePage.Tag = -1 then begin
+        cxPG.ActivePage.Free;
+        cxPG.ActivePageIndex := 0;
+        Exit;
+      end;
+
+      if cxPG.ActivePage.Tag >= 0 then begin
+        id := cxPG.ActivePage.Tag;
+        i := cxPG.ActivePageIndex;
+      end
+      else begin
+        id := qMedical_cardid.Value;
+        i := findPage(id);
+      end;
       if (i < 0) or TfmCardEdit(getCard(i)).save then begin
-        delete(qMedical_cardid.Value);
+        delete(id);
         cxPG.ActivePageIndex := 0;
       end;
     end;
