@@ -95,7 +95,9 @@ object fmCardEdit: TfmCardEdit
     Left = 32
     Top = 104
     DataBinding.DataField = 'last_name'
-    DataBinding.DataSource = dmCardEdit.dsqMedical_card
+    Properties.ValidateOnEnter = True
+    Properties.ValidationOptions = [evoRaiseException, evoShowErrorIcon, evoAllowLoseFocus]
+    Properties.OnValidate = edLast_namePropertiesValidate
     TabOrder = 1
     Width = 137
   end
@@ -103,7 +105,8 @@ object fmCardEdit: TfmCardEdit
     Left = 175
     Top = 104
     DataBinding.DataField = 'first_name'
-    DataBinding.DataSource = dmCardEdit.dsqMedical_card
+    Properties.ValidationOptions = [evoRaiseException, evoShowErrorIcon, evoAllowLoseFocus]
+    Properties.OnValidate = edFirst_namePropertiesValidate
     TabOrder = 2
     Width = 137
   end
@@ -111,7 +114,6 @@ object fmCardEdit: TfmCardEdit
     Left = 318
     Top = 104
     DataBinding.DataField = 'middle_name'
-    DataBinding.DataSource = dmCardEdit.dsqMedical_card
     TabOrder = 3
     Width = 129
   end
@@ -119,7 +121,8 @@ object fmCardEdit: TfmCardEdit
     Left = 32
     Top = 160
     DataBinding.DataField = 'date_birth'
-    DataBinding.DataSource = dmCardEdit.dsqMedical_card
+    Properties.ValidationOptions = [evoRaiseException, evoShowErrorIcon, evoAllowLoseFocus]
+    Properties.OnValidate = edDate_birthPropertiesValidate
     TabOrder = 4
     Width = 121
   end
@@ -127,14 +130,15 @@ object fmCardEdit: TfmCardEdit
     Left = 175
     Top = 160
     DataBinding.DataField = 'gender_id'
-    DataBinding.DataSource = dmCardEdit.dsqMedical_card
     Properties.KeyFieldNames = 'id'
     Properties.ListColumns = <
       item
         FieldName = 'name'
       end>
     Properties.ListOptions.ShowHeader = False
-    Properties.ListSource = dmCard.dsqGender
+    Properties.ListSource = dmMain.dsqGender
+    Properties.ValidationOptions = [evoRaiseException, evoShowErrorIcon, evoAllowLoseFocus]
+    Properties.OnValidate = edGenderPropertiesValidate
     TabOrder = 5
     Width = 121
   end
@@ -142,7 +146,6 @@ object fmCardEdit: TfmCardEdit
     Left = 32
     Top = 216
     DataBinding.DataField = 'phone'
-    DataBinding.DataSource = dmCardEdit.dsqMedical_card
     TabOrder = 6
     Width = 137
   end
@@ -150,7 +153,6 @@ object fmCardEdit: TfmCardEdit
     Left = 472
     Top = 104
     DataBinding.DataField = 'job_info'
-    DataBinding.DataSource = dmCardEdit.dsqMedical_card
     TabOrder = 8
     Width = 415
   end
@@ -158,7 +160,6 @@ object fmCardEdit: TfmCardEdit
     Left = 175
     Top = 216
     DataBinding.DataField = 'document_info'
-    DataBinding.DataSource = dmCardEdit.dsqMedical_card
     TabOrder = 7
     Width = 272
   end
@@ -166,7 +167,6 @@ object fmCardEdit: TfmCardEdit
     Left = 474
     Top = 216
     DataBinding.DataField = 'note'
-    DataBinding.DataSource = dmCardEdit.dsqMedical_card
     TabOrder = 10
     Height = 89
     Width = 413
@@ -175,7 +175,6 @@ object fmCardEdit: TfmCardEdit
     Left = 472
     Top = 160
     DataBinding.DataField = 'address'
-    DataBinding.DataSource = dmCardEdit.dsqMedical_card
     TabOrder = 9
     Width = 415
   end
@@ -183,14 +182,13 @@ object fmCardEdit: TfmCardEdit
     Left = 32
     Top = 32
     DataBinding.DataField = 'state_id'
-    DataBinding.DataSource = dmCardEdit.dsqMedical_card
     Properties.KeyFieldNames = 'id'
     Properties.ListColumns = <
       item
         FieldName = 'name'
       end>
     Properties.ListOptions.ShowHeader = False
-    Properties.ListSource = dmCard.dsqPatient_state
+    Properties.ListSource = dmMain.dsqPatient_state
     TabOrder = 0
     Width = 145
   end

@@ -6,6 +6,7 @@ uses System.Classes, Data.DB, FireDAC.Comp.Client;
 
 type
 
+  { insert, update }
   TSQLGenerate = class
   private
     FTable_name: string;
@@ -58,9 +59,47 @@ type
     procedure initializeSQLText(table_name: string; fields: TFields; fieldsNotUsed: string); override;
   end;
 
+  { condition }
+  TConditionType = (ctEq, ctIn, ctLike);
+  TConnectionType = (ctAnd, ctOr);
+
+  TValue = class
+  private
+    Fvalue: variant;
+    Fcondition: TConditionType;
+    Fconnection: TConnectionType;
+
+    function getConditionStr: string;
+    function getConnectionStr: string;
+  public
+    property value: variant read Fvalue;
+    property condition: string read getConditionStr;
+    property connection: string read getConnectionStr;
+
+    constructor Create(value: variant; condition: TConditionType; connection: TConnectionType);
+
+
+  end;
+
+  TSQLCondition = class
+  private
+    FsqlSelect: string;
+    FConditions: TStringList;
+    FSQLText: string;
+
+    function getSQLText: string;
+  public
+    property SQLText: string read getSQLText;
+
+    constructor Create(sqlSelect: string = '');
+    destructor Free;
+    function addAnd(field, value: string; condition: TConditionType): TSQLCondition;
+    function addOr(field, value: string; condition: TConditionType): TSQLCondition;
+  end;
+
 implementation
 
-uses System.SysUtils, StrUtils;
+uses System.SysUtils, StrUtils, Variants;
 
 { TSQLGenerate }
 
@@ -197,6 +236,104 @@ begin
   with TSQLGenerateUpdate.Create(table_name, fields, fieldsNotUsed) do begin
     FSQLText := SQLText;
     Free;
+  end;
+end;
+
+{ TSQLCondition }
+
+function TSQLCondition.addAnd(field, value: string;
+  condition: TConditionType): TSQLCondition;
+var
+  v: TValue;
+begin
+  v := TValue.Create(value, condition, ctAnd);
+  FConditions.AddObject(field, v);
+  result := self;
+end;
+
+function TSQLCondition.addOr(field, value: string;
+  condition: TConditionType): TSQLCondition;
+var
+  v: TValue;
+begin
+  v := TValue.Create(value, condition, ctOr);
+  FConditions.AddObject(field, v);
+  result := self;
+end;
+
+constructor TSQLCondition.Create(sqlSelect: string);
+begin
+  FsqlSelect := sqlSelect;
+  FConditions := TStringList.Create;
+end;
+
+destructor TSQLCondition.Free;
+begin
+  if Assigned(FConditions) then begin
+    while FConditions.Count > 0 do
+      FConditions.Delete(0);
+    FreeAndNil(FConditions);
+  end;
+end;
+
+function TSQLCondition.getSQLText: string;
+var
+  i: integer;
+  prev: string;
+begin
+  result := '';
+  FSQLText := '';
+  prev := '';
+  for i := 0 to FConditions.Count - 1 do begin
+    if FSQLText <> '' then
+      prev := TValue(FConditions.Objects[i]).connection;
+    FSQLText := Format('%s %s (%s %s %s)', [FSQLText,
+                                    prev,
+                                    FConditions[i],
+                                    TValue(FConditions.Objects[i]).condition,
+                                    TValue(FConditions.Objects[i]).value ])
+
+  end;
+  result := FSQLText;
+end;
+
+{ TValue }
+
+constructor TValue.Create(value: variant; condition: TConditionType; connection: TConnectionType);
+begin
+  Fcondition := condition;
+  Fconnection := connection;
+  case condition of
+    ctEq: begin
+      if VarIsType(value, varString) then
+        Fvalue := VarToStr(value).QuotedString
+      else
+        Fvalue := VarToStr(value);
+    end;
+    ctLike: Fvalue := ('%%' + VarToStr(value) + '%%').QuotedString;
+    ctIn: FValue := '(' + VarToStr(value) + ')';
+  end;
+
+end;
+
+function TValue.getConditionStr: string;
+begin
+  case Fcondition of
+    ctEq: result := '=';
+    ctIn: result := 'in';
+    ctLike: result := 'like';
+  else
+    result := '';
+  end;
+end;
+
+function TValue.getConnectionStr: string;
+begin
+  case Fconnection of
+    ctAnd: result := 'and';
+    ctOr: result := 'or';
+  else
+    result := '';
   end;
 end;
 

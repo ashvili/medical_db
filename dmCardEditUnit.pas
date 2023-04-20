@@ -39,7 +39,6 @@ type
     WideStringField7: TWideStringField;
     dMedical_carddate_created: TDateField;
     dMedical_cardstate_id: TSmallintField;
-    qTmp: TFDQuery;
   private
     { Private declarations }
     Fid: integer;
@@ -60,7 +59,7 @@ implementation
 
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 
-uses Dialogs, dmCardListUnit, sqlGenerateUnit;
+uses Dialogs, sqlGenerateUnit, dmMainUnit;
 
 {$R *.dfm}
 
@@ -74,7 +73,7 @@ end;
 
 procedure TdmCardEdit.insertMedical_card;
 begin
-  with TTableUpdateInsert.Create(dmCard.FDConnection, 'medical_card', dMedical_card.Fields) do begin
+  with TTableUpdateInsert.Create(dmMain.FDConnection, 'medical_card', dMedical_card.Fields) do begin
      execSQL;
      Free;
   end;
@@ -114,7 +113,7 @@ end;
 
 procedure TdmCardEdit.updateMedical_card;
 begin
-  with TTableUpdateUpdate.Create(dmCard.FDConnection, 'medical_card', dMedical_card.Fields) do begin
+  with TTableUpdateUpdate.Create(dmMain.FDConnection, 'medical_card', dMedical_card.Fields) do begin
      execSQL;
      Free;
   end;

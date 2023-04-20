@@ -13,12 +13,13 @@ uses
   cxGridCustomTableView, cxGridTableView, cxGridDBTableView, cxGrid,
   Vcl.ExtCtrls, Vcl.StdCtrls,
   settings, Vcl.ToolWin, Vcl.ActnMan, Vcl.ActnCtrls, IDETheme.ActnCtrls,
-  StdStyleActnCtrls;
+  StdStyleActnCtrls, dxRibbonSkins, dxRibbonCustomizationForm, dxRibbon, dxBar,
+  cxContainer, cxLabel, cxTextEdit, cxMaskEdit, cxDropDownEdit, cxMRUEdit,
+  dxBarExtItems, cxLookupEdit, cxDBLookupEdit, cxDBLookupComboBox;
 
 type
   TfmCardList = class(TForm)
     cxPG: TcxPageControl;
-    Panel1: TPanel;
     cxTabSheet1: TcxTabSheet;
     cxGrid1DBTableView1: TcxGridDBTableView;
     cxGrid1Level1: TcxGridLevel;
@@ -30,16 +31,39 @@ type
     cxGrid1DBTableView1gender_name: TcxGridDBColumn;
     cxGrid1DBTableView1fio: TcxGridDBColumn;
     ActionManager1: TActionManager;
-    aShow: TAction;
+    aFilterApply: TAction;
     aEdit: TAction;
     aNew: TAction;
     aDelete: TAction;
-    ActionToolBar1: TActionToolBar;
     aExit: TAction;
     aSave: TAction;
+    dxBarManager1: TdxBarManager;
+    dxBarPopupMenu1: TdxBarPopupMenu;
+    dxRibbon1Tab1: TdxRibbonTab;
+    dxRibbon1: TdxRibbon;
+    dxRibbon1Tab2: TdxRibbonTab;
+    dxRibbon1Tab3: TdxRibbonTab;
+    dxBarManager1Bar1: TdxBar;
+    dxNew_card: TdxBarButton;
+    dxEditCard: TdxBarButton;
+    dxDelete_card: TdxBarButton;
+    dxLargeNew_card: TdxBarLargeButton;
+    dxBarManager1Bar2: TdxBar;
+    dxLargeSave_card: TdxBarLargeButton;
+    dxBarManager1Bar3: TdxBar;
+    dxFilterPanel: TdxBarControlContainerItem;
+    Panel1: TPanel;
+    edFIO: TcxMRUEdit;
+    cxLabel1: TcxLabel;
+    cxLabel2: TcxLabel;
+    cxLabel3: TcxLabel;
+    dxFilterApply: TdxBarLargeButton;
+    edPatient_state: TcxLookupComboBox;
+    edGender: TcxLookupComboBox;
+    cxGrid1DBTableView1state_name: TcxGridDBColumn;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure aShowExecute(Sender: TObject);
+    procedure aFilterApplyExecute(Sender: TObject);
     procedure aEditExecute(Sender: TObject);
     procedure aNewExecute(Sender: TObject);
     procedure aDeleteExecute(Sender: TObject);
@@ -48,6 +72,7 @@ type
     procedure cxGrid1DBTableView1CellDblClick(Sender: TcxCustomGridTableView;
       ACellViewInfo: TcxGridTableDataCellViewInfo; AButton: TMouseButton;
       AShift: TShiftState; var AHandled: Boolean);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
   private
     { Private declarations }
     FProcedureClose: TProcedureClose;
@@ -64,6 +89,8 @@ type
     procedure saveMedical_card;
 
     procedure closeList;
+
+    procedure filterApply;
   public
     { Public declarations }
   end;
@@ -75,7 +102,7 @@ implementation
 
 {$R *.dfm}
 
-uses dmCardListUnit, cardEdit, StrUtils;
+uses dmCardListUnit, cardEdit, StrUtils, dmMainUnit, sqlGenerateUnit;
 
 procedure TfmCardList.addPage(medical_card_id: integer);
 var
@@ -118,9 +145,12 @@ begin
   saveMedical_card;
 end;
 
-procedure TfmCardList.aShowExecute(Sender: TObject);
+procedure TfmCardList.aFilterApplyExecute(Sender: TObject);
 begin
-  showMedical_card;
+  if dxFilterApply.Down then
+    filterApply
+  else
+    showMedical_card;
 end;
 
 procedure TfmCardList.closeList;
@@ -149,10 +179,10 @@ procedure TfmCardList.deleteMedical_card;
 var
   i: integer;
 begin
-  if MessageDlg('Удалить карту?', mtConfirmation, mbOKCancel, 0) <> mrOK then
-    Exit;
-  with dmCard do begin
+  with dmCardList do begin
     if qMedical_card.Active and (qMedical_card.RecordCount > 0) then begin
+      if MessageDlg('Удалить карту?', mtConfirmation, mbOKCancel, 0) <> mrOK then
+        Exit;
       i := findPage(qMedical_cardid.Value);
       if (i < 0) or TfmCardEdit(getCard(i)).save then begin
         delete(qMedical_cardid.Value);
@@ -166,14 +196,52 @@ procedure TfmCardList.editMedical_card;
 var
   i: integer;
 begin
-  if dmCard.qMedical_card.Active and (dmCard.qMedical_card.RecordCount > 0) then begin
-    i := findPage(dmCard.qMedical_cardid.Value);
-    if i >= 0 then
-      cxPG.ActivePageIndex := i    
-    else begin
-      addPage(dmCard.qMedical_cardid.Value);
+  with dmCardList do begin
+    if qMedical_card.Active and (qMedical_card.RecordCount > 0) then begin
+      i := findPage(qMedical_cardid.Value);
+      if i >= 0 then
+        cxPG.ActivePageIndex := i
+      else begin
+        addPage(qMedical_cardid.Value);
+      end;
     end;
   end;
+end;
+
+procedure TfmCardList.filterApply;
+var
+  fio: string;
+  gender_id, patient_state_id: integer;
+  filter_obj: TSQLCondition;
+  sqlTxt: string;
+begin
+  fio := trim(edFIO.EditText);
+  if not (VarIsEmpty(edPatient_state.EditValue) or VarIsNull(edPatient_state.EditValue)) then
+    patient_state_id := edPatient_state.EditValue
+  else
+    patient_state_id := -1;
+  if not (VarIsEmpty(edGender.EditValue) or VarIsNull(edGender.EditValue))then
+    gender_id := edGender.EditValue
+  else
+    gender_id := -1;
+
+  filter_obj := TSQLCondition.Create();
+  if fio <> '' then
+    filter_obj.addAnd(FIO_FIELD, fio, ctLike);
+  if patient_state_id > 0  then
+    filter_obj.addAnd('medical_card.state_id', patient_state_id.ToString, ctEq);
+  if gender_id >= 0 then
+    filter_obj.addAnd('medical_card.gender_id', gender_id.ToString, ctEq);
+
+  with dmCardList.qMedical_card do begin
+    Close;
+    SQL.Text := format('%s WHERE %s', [SQL_MEDICAL_CARD_LIST,
+                                        filter_obj.SQLText ]);
+    Open;
+  end;
+
+  if (fio.length > 0) and (TcxTextEditProperties(edFIO.Properties).LookupItems.IndexOf(fio) < 0) then
+        TcxTextEditProperties(edFIO.Properties).LookupItems.Add(fio);
 end;
 
 function TfmCardList.findPage(medical_card_id: integer): integer;
@@ -188,6 +256,13 @@ begin
     end;
 end;
 
+procedure TfmCardList.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  CanClose := MessageDlg('Закрыть программу?',
+                          mtConfirmation,
+                          mbYesNo, 0) = mrYes;
+end;
+
 procedure TfmCardList.FormCreate(Sender: TObject);
 begin
   FProcedureClose := closePage;
@@ -195,7 +270,7 @@ end;
 
 procedure TfmCardList.FormShow(Sender: TObject);
 begin
-  dmCard.init;
+  dmCardList.init;
 end;
 
 function TfmCardList.getCard(index: integer): TControl;
@@ -229,13 +304,13 @@ begin
     card := getCard(cxPG.ActivePageIndex);
     if Assigned(card) and (card is TfmCardEdit) then
       TfmCardEdit(card).save;
-    dmCard.openMedical_card;
+    dmCardList.openMedical_card;
   end;
 end;
 
 procedure TfmCardList.showMedical_card;
 begin
-  dmCard.openMedical_card;
+  dmCardList.openMedical_card;
 end;
 
 end.

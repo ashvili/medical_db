@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,
   settings, dmCardEditUnit,
-  dmCardListUnit, cxGraphics, cxControls, cxLookAndFeels, cxLookAndFeelPainters,
+  cxGraphics, cxControls, cxLookAndFeels, cxLookAndFeelPainters,
   cxContainer, cxEdit, dxSkinsCore, dxSkinsDefaultPainters, cxMemo, cxDBEdit,
   cxDropDownEdit, cxLookupEdit, cxDBLookupEdit, cxDBLookupComboBox, cxMaskEdit,
   cxCalendar, cxLabel, cxDBLabel, cxTextEdit;
@@ -36,6 +36,14 @@ type
     Label10: TLabel;
     Label11: TLabel;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure edLast_namePropertiesValidate(Sender: TObject;
+      var DisplayValue: Variant; var ErrorText: TCaption; var Error: Boolean);
+    procedure edFirst_namePropertiesValidate(Sender: TObject;
+      var DisplayValue: Variant; var ErrorText: TCaption; var Error: Boolean);
+    procedure edDate_birthPropertiesValidate(Sender: TObject;
+      var DisplayValue: Variant; var ErrorText: TCaption; var Error: Boolean);
+    procedure edGenderPropertiesValidate(Sender: TObject;
+      var DisplayValue: Variant; var ErrorText: TCaption; var Error: Boolean);
   private
     { Private declarations }
     Fdm: TdmCardEdit;
@@ -43,6 +51,7 @@ type
     FProcedureClose: TProcedureClose;
 
     procedure updateDateBinding;
+    function checkFill: boolean;
   public
     { Public declarations }
     constructor Create(AOwner: TComponent; AParent: TWinControl;
@@ -57,9 +66,19 @@ var
 
 implementation
 
+uses dmMainUnit;
+
 {$R *.dfm}
 
 { TfmCardEdit }
+
+function TfmCardEdit.checkFill: boolean;
+begin
+  result := edLast_name.ValidateEdit(true)
+            and edFirst_name.ValidateEdit(true)
+            and edDate_birth.ValidateEdit(true)
+            and edGender.ValidateEdit(true);
+end;
 
 constructor TfmCardEdit.Create(AOwner: TComponent; AParent: TWinControl;
                                 medical_card_id: integer;
@@ -79,6 +98,43 @@ begin
   end;
 end;
 
+procedure TfmCardEdit.edDate_birthPropertiesValidate(Sender: TObject;
+  var DisplayValue: Variant; var ErrorText: TCaption; var Error: Boolean);
+begin
+  if VarIsNull(DisplayValue) or (VarToStr(DisplayValue).Trim = '')
+  then begin
+    Error := true;
+    ErrorText := 'Необходимо заполнить дату рождения!';
+  end;
+end;
+
+procedure TfmCardEdit.edFirst_namePropertiesValidate(Sender: TObject;
+  var DisplayValue: Variant; var ErrorText: TCaption; var Error: Boolean);
+begin
+  if VarIsNull(DisplayValue) or (VarToStr(DisplayValue).Trim = '') then begin
+    Error := true;
+    ErrorText := 'Необходимо ввести имя!';
+  end;
+end;
+
+procedure TfmCardEdit.edGenderPropertiesValidate(Sender: TObject;
+  var DisplayValue: Variant; var ErrorText: TCaption; var Error: Boolean);
+begin
+  if VarIsNull(DisplayValue) or (VarToStr(DisplayValue).Trim = '') then begin
+    Error := true;
+    ErrorText := 'Необходимо указать пол!';
+  end;
+end;
+
+procedure TfmCardEdit.edLast_namePropertiesValidate(Sender: TObject;
+  var DisplayValue: Variant; var ErrorText: TCaption; var Error: Boolean);
+begin
+  if VarIsNull(DisplayValue) or (VarToStr(DisplayValue).Trim = '') then begin
+    Error := true;
+    ErrorText := 'Необходимо ввести фамилию!';
+  end;
+end;
+
 procedure TfmCardEdit.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Fdm.Free;
@@ -87,7 +143,7 @@ end;
 
 function TfmCardEdit.save: boolean;
 begin
-  result := Fdm.save;
+  result := checkFill and Fdm.save;
   if result then
     Close;
 end;

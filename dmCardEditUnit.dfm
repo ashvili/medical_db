@@ -3,7 +3,7 @@ object dmCardEdit: TdmCardEdit
   Height = 482
   Width = 667
   object qMedical_card: TFDQuery
-    Connection = dmCard.FDConnection
+    Connection = dmMain.FDConnection
     SQL.Strings = (
       'SELECT medical_card.*'
       'FROM'#10' medical_card'#10
@@ -149,10 +149,5 @@ object dmCardEdit: TdmCardEdit
       FieldName = 'state_id'
       Origin = 'state_id'
     end
-  end
-  object qTmp: TFDQuery
-    Connection = dmCard.FDConnection
-    Left = 200
-    Top = 56
   end
 end
