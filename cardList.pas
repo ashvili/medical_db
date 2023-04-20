@@ -102,7 +102,8 @@ implementation
 
 {$R *.dfm}
 
-uses dmCardListUnit, cardEdit, StrUtils, dmMainUnit, sqlGenerateUnit;
+uses dmCardListUnit, StrUtils, dmMainUnit, sqlGenerateUnit,
+  frameCardEditUnit;
 
 procedure TfmCardList.addPage(medical_card_id: integer);
 var
@@ -116,7 +117,7 @@ begin
                       'Новая мед.карта');
     Tag := medical_card_id;
   end;
-  TfmCardEdit.Create(newTab, newTab, medical_card_id, FProcedureClose).Show;
+  TframeCardEdit.Create(newTab, newTab, medical_card_id, FProcedureClose).Show;
   cxPG.ActivePage := newTab;
 end;
 
@@ -165,7 +166,7 @@ var
 begin
   i := findPage(medical_card_id);
   if i >= 0 then
-    cxPG.Pages[i].Free;  
+    cxPG.Pages[i].Free;
 end;
 
 procedure TfmCardList.cxGrid1DBTableView1CellDblClick(
@@ -178,14 +179,29 @@ end;
 procedure TfmCardList.deleteMedical_card;
 var
   i: integer;
+  id: integer;
 begin
   with dmCardList do begin
     if qMedical_card.Active and (qMedical_card.RecordCount > 0) then begin
       if MessageDlg('Удалить карту?', mtConfirmation, mbOKCancel, 0) <> mrOK then
         Exit;
-      i := findPage(qMedical_cardid.Value);
-      if (i < 0) or TfmCardEdit(getCard(i)).save then begin
-        delete(qMedical_cardid.Value);
+
+      if cxPG.ActivePage.Tag = -1 then begin
+        cxPG.ActivePage.Free;
+        cxPG.ActivePageIndex := 0;
+        Exit;
+      end;
+
+      if cxPG.ActivePage.Tag >= 0 then begin
+        id := cxPG.ActivePage.Tag;
+        i := cxPG.ActivePageIndex;
+      end
+      else begin
+        id := qMedical_cardid.Value;
+        i := findPage(id);
+      end;
+      if (i < 0) or TframeCardEdit(getCard(i)).save then begin
+        delete(id);
         cxPG.ActivePageIndex := 0;
       end;
     end;
@@ -279,7 +295,7 @@ var
 begin
   result := nil;
   for i := 0 to cxPG.Pages[index].ControlCount - 1 do
-    if cxPG.Pages[index].Controls[i] is TfmCardEdit then begin
+    if cxPG.Pages[index].Controls[i] is TframeCardEdit then begin
       result := cxPG.Pages[index].Controls[i];
       break;
     end;
@@ -302,8 +318,8 @@ var
 begin
   if (cxPG.ActivePage <> nil) and (cxPG.ActivePage.Tag > -2) then begin
     card := getCard(cxPG.ActivePageIndex);
-    if Assigned(card) and (card is TfmCardEdit) then
-      TfmCardEdit(card).save;
+    if Assigned(card) and (card is TframeCardEdit) then
+      TframeCardEdit(card).save;
     dmCardList.openMedical_card;
   end;
 end;

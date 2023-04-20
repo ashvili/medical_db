@@ -8,7 +8,8 @@ uses
   dmCardEditUnit in 'dmCardEditUnit.pas' {dmCardEdit: TDataModule},
   settings in 'settings.pas',
   sqlGenerateUnit in 'sqlGenerateUnit.pas',
-  dmMainUnit in 'dmMainUnit.pas' {dmMain: TDataModule};
+  dmMainUnit in 'dmMainUnit.pas' {dmMain: TDataModule},
+  frameCardEditUnit in 'frameCardEditUnit.pas' {frameCardEdit: TFrame};
 
 {$R *.res}
 
