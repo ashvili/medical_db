@@ -9,6 +9,7 @@ object dmCard: TdmCard
       'User_Name=postgres'
       'Password=postgres'
       'DriverID=PG')
+    Connected = True
     LoginPrompt = False
     Left = 56
     Top = 24
@@ -305,5 +306,56 @@ object dmCard: TdmCard
           50C2566C7BF0ECD258A3E846200FF066B5AAB4462B3B800628FF0122CC6063F4
           5F96130000000049454E44AE426082}
       end>
+  end
+  object qTmp: TFDQuery
+    Connection = FDConnection
+    Left = 144
+    Top = 80
+  end
+  object qPatient_state: TFDQuery
+    Connection = FDConnection
+    SQL.Strings = (
+      'SELECT *'
+      'FROM patient_state')
+    Left = 200
+    Top = 88
+    object qPatient_stateid: TSmallintField
+      FieldName = 'id'
+      Origin = 'id'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+    end
+    object qPatient_statename: TWideStringField
+      FieldName = 'name'
+      Origin = 'name'
+      Size = 50
+    end
+  end
+  object dsqPatient_state: TDataSource
+    DataSet = qPatient_state
+    Left = 200
+    Top = 152
+  end
+  object qGender: TFDQuery
+    Connection = FDConnection
+    SQL.Strings = (
+      'SELECT *'
+      'FROM gender;')
+    Left = 264
+    Top = 88
+    object qGenderid: TSmallintField
+      FieldName = 'id'
+      Origin = 'id'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+    end
+    object qGendername: TWideStringField
+      FieldName = 'name'
+      Origin = 'name'
+      Size = 50
+    end
+  end
+  object dsqGender: TDataSource
+    DataSet = qGender
+    Left = 264
+    Top = 152
   end
 end

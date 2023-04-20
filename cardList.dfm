@@ -3,7 +3,7 @@ object fmCardList: TfmCardList
   Top = 0
   Caption = #1057#1087#1080#1089#1086#1082' '#1084#1077#1076#1080#1094#1080#1085#1089#1082#1080#1093' '#1082#1072#1088#1090
   ClientHeight = 511
-  ClientWidth = 818
+  ClientWidth = 972
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,32 +17,35 @@ object fmCardList: TfmCardList
   TextHeight = 13
   object cxPG: TcxPageControl
     Left = 0
-    Top = 115
-    Width = 818
-    Height = 396
+    Top = 57
+    Width = 972
+    Height = 454
     Align = alClient
     TabOrder = 0
     Properties.ActivePage = cxTabSheet1
     Properties.CustomButtons.Buttons = <>
-    ExplicitTop = 89
-    ExplicitHeight = 422
-    ClientRectBottom = 392
+    ExplicitTop = 115
+    ExplicitWidth = 818
+    ExplicitHeight = 396
+    ClientRectBottom = 450
     ClientRectLeft = 4
-    ClientRectRight = 814
+    ClientRectRight = 968
     ClientRectTop = 24
     object cxTabSheet1: TcxTabSheet
       Tag = -2
       Caption = #1057#1087#1080#1089#1086#1082' '#1082#1072#1088#1090
       ImageIndex = 0
-      ExplicitHeight = 394
+      ExplicitWidth = 810
+      ExplicitHeight = 368
       object cxGrid1: TcxGrid
         Left = 0
         Top = 0
-        Width = 810
-        Height = 368
+        Width = 964
+        Height = 426
         Align = alClient
         TabOrder = 0
-        ExplicitHeight = 394
+        ExplicitWidth = 810
+        ExplicitHeight = 368
         object cxGrid1DBTableView1: TcxGridDBTableView
           Navigator.Buttons.CustomButtons = <>
           Navigator.Buttons.First.Visible = True
@@ -63,10 +66,17 @@ object fmCardList: TfmCardList
           Navigator.Buttons.Filter.Visible = True
           FindPanel.DisplayMode = fpdmAlways
           FindPanel.InfoText = #1042#1074#1077#1076#1080#1090#1077' '#1090#1077#1082#1089#1090' '#1076#1083#1103' '#1087#1086#1080#1089#1082#1072'...'
+          OnCellDblClick = cxGrid1DBTableView1CellDblClick
           DataController.DataSource = dmCard.dsqMedical_card
           DataController.Summary.DefaultGroupSummaryItems = <>
-          DataController.Summary.FooterSummaryItems = <>
+          DataController.Summary.FooterSummaryItems = <
+            item
+              Kind = skCount
+              Column = cxGrid1DBTableView1fio
+            end>
           DataController.Summary.SummaryGroups = <>
+          OptionsBehavior.IncSearch = True
+          OptionsBehavior.ImmediateEditor = False
           OptionsCustomize.ColumnFiltering = False
           OptionsCustomize.ColumnGrouping = False
           OptionsCustomize.ColumnSorting = False
@@ -75,7 +85,7 @@ object fmCardList: TfmCardList
           OptionsData.Editing = False
           OptionsData.Inserting = False
           OptionsView.CellAutoHeight = True
-          OptionsView.GroupByBox = False
+          OptionsView.Footer = True
           OptionsView.HeaderAutoHeight = True
           OptionsView.Indicator = True
           object cxGrid1DBTableView1id: TcxGridDBColumn
@@ -122,51 +132,50 @@ object fmCardList: TfmCardList
   object Panel1: TPanel
     Left = 0
     Top = 26
-    Width = 818
-    Height = 89
+    Width = 972
+    Height = 31
     Align = alTop
     TabOrder = 1
-    ExplicitTop = 0
+    ExplicitWidth = 818
   end
   object ActionToolBar1: TActionToolBar
     Left = 0
     Top = 0
-    Width = 818
+    Width = 972
     Height = 26
     ActionManager = ActionManager1
     Caption = 'ActionToolBar1'
-    Color = clMenuBar
-    ColorMap.DisabledFontColor = 7171437
-    ColorMap.HighlightColor = clWhite
-    ColorMap.BtnSelectedFont = clBlack
+    ColorMap.HighlightColor = clBtnHighlight
     ColorMap.UnusedColor = clWhite
+    ColorMap.MenuColor = clMenu
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clBlack
+    Font.Color = clWindowText
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
     Spacing = 0
+    ExplicitWidth = 818
   end
   object ActionManager1: TActionManager
     ActionBars = <
       item
         Items = <
           item
-            Action = aShow
-            ImageIndex = 0
+            Action = aNew
+            ImageIndex = 1
           end
           item
             Action = aEdit
             ImageIndex = 3
           end
           item
-            Action = aNew
-            ImageIndex = 1
-          end
-          item
             Action = aDelete
             ImageIndex = 2
+          end
+          item
+            Action = aSave
+            ImageIndex = 4
           end
           item
             Action = aExit
@@ -175,9 +184,9 @@ object fmCardList: TfmCardList
         ActionBar = ActionToolBar1
       end>
     Images = dmCard.cxImageList1
-    Left = 456
-    Top = 72
-    StyleName = 'IDE Theme Style'
+    Left = 416
+    Top = 208
+    StyleName = 'Standard'
     object aShow: TAction
       Caption = #1055#1086#1082#1072#1079#1072#1090#1100
       ImageIndex = 0
@@ -201,6 +210,12 @@ object fmCardList: TfmCardList
     object aExit: TAction
       Caption = #1042#1099#1093#1086#1076
       ImageIndex = 5
+      OnExecute = aExitExecute
+    end
+    object aSave: TAction
+      Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100
+      ImageIndex = 4
+      OnExecute = aSaveExecute
     end
   end
 end
