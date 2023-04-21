@@ -250,7 +250,7 @@ object fmCardList: TfmCardList
             ImageIndex = 4
           end
           item
-            Action = aExit
+            Action = aClose
             ImageIndex = 5
           end>
       end
@@ -280,10 +280,10 @@ object fmCardList: TfmCardList
       ImageIndex = 2
       OnExecute = aDeleteExecute
     end
-    object aExit: TAction
-      Caption = #1042#1099#1093#1086#1076
+    object aClose: TAction
+      Caption = #1047#1072#1082#1088#1099#1090#1100
       ImageIndex = 5
-      OnExecute = aExitExecute
+      OnExecute = aCloseExecute
     end
     object aSave: TAction
       Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100
@@ -332,11 +332,15 @@ object fmCardList: TfmCardList
         end
         item
           Visible = True
-          ItemName = 'dxEditCard'
+          ItemName = 'dxLargeEdit_card'
         end
         item
           Visible = True
           ItemName = 'dxDelete_card'
+        end
+        item
+          Visible = True
+          ItemName = 'dxCardClose'
         end>
       OneOnRow = False
       Row = 0
@@ -347,7 +351,7 @@ object fmCardList: TfmCardList
     object dxBarManager1Bar2: TdxBar
       Caption = #1057#1086#1093#1088#1072#1085#1077#1085#1080#1077
       CaptionButtons = <>
-      DockedLeft = 184
+      DockedLeft = 246
       DockedTop = 0
       FloatLeft = 1000
       FloatTop = 2
@@ -406,6 +410,14 @@ object fmCardList: TfmCardList
     end
     object dxLargeSave_card: TdxBarLargeButton
       Action = aSave
+      Category = 0
+    end
+    object dxCardClose: TdxBarButton
+      Action = aClose
+      Category = 0
+    end
+    object dxLargeEdit_card: TdxBarLargeButton
+      Action = aEdit
       Category = 0
     end
     object dxFilterPanel: TdxBarControlContainerItem
