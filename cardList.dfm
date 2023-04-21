@@ -176,6 +176,7 @@ object fmCardList: TfmCardList
     Height = 74
     BevelOuter = bvNone
     TabOrder = 2
+    Visible = False
     object edFIO: TcxMRUEdit
       Left = 110
       Top = 2
