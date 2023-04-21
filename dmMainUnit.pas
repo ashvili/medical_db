@@ -1,5 +1,8 @@
 unit dmMainUnit;
-
+{
+common tables (dictionaries)
+common images
+}
 interface
 
 uses
@@ -51,6 +54,7 @@ end;
 
 procedure TdmMain.init;
 begin
+  { open dictionaries }
   qPatient_state.Open();
   qGender.Open();
 end;

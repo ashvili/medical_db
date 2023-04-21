@@ -1,5 +1,7 @@
 unit dmCardEditUnit;
 
+{ datamodule for edit-card form/frame }
+
 interface
 
 uses
@@ -72,14 +74,17 @@ begin
 end;
 
 procedure TdmCardEdit.insertMedical_card;
+{ save new medical card to DB }
 begin
   with TTableUpdateInsert.Create(dmMain.FDConnection, 'medical_card', dMedical_card.Fields) do begin
-     execSQL;
+     Execute;
      Free;
   end;
 end;
 
 procedure TdmCardEdit.load;
+{ load table from DB to table-in-memory,
+  orcreate empty record }
 begin
   dMedical_card.Close;
   dMedical_card.Open;
@@ -96,14 +101,15 @@ begin
 end;
 
 function TdmCardEdit.save: boolean;
+{ save table to DB }
 begin
   result := false;
   try
     if dMedical_card.State in [dsInsert, dsEdit] then
       dMedical_card.Post;
-    if Fid >= 0 then
+    if Fid >= 0 then // existing medical card
       updateMedical_card
-    else
+    else             // new medical card
       insertMedical_card;
     result := true;
   except on e: Exception do
@@ -114,7 +120,7 @@ end;
 procedure TdmCardEdit.updateMedical_card;
 begin
   with TTableUpdateUpdate.Create(dmMain.FDConnection, 'medical_card', dMedical_card.Fields) do begin
-     execSQL;
+     Execute;
      Free;
   end;
 end;

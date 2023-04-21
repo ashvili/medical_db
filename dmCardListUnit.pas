@@ -1,5 +1,7 @@
 unit dmCardListUnit;
 
+{ data for list of medical cards}
+
 interface
 
 uses
@@ -13,10 +15,12 @@ uses
 
 
 const
+  // field for filtering by FIO
   FIO_FIELD = 'COALESCE(medical_card.last_name, '''') || '' '' '+
               '|| COALESCE(medical_card.first_name, '''') || '' '' '+
               '|| COALESCE(medical_card.middle_name, '''')';
 
+  // base query's text for the list
   SQL_MEDICAL_CARD_LIST =
     'SELECT '+
           'medical_card."id", '+
@@ -77,6 +81,7 @@ uses StrUtils, dmMainUnit;
 {$R *.dfm}
 
 procedure TdmCardList.delete(id: integer);
+{ delete record with id=id from table medical_card in DB}
 const
   sqlDelete =
     'DELETE FROM medical_card '+
@@ -88,7 +93,7 @@ begin
     with dmMain.qTmp do begin
       Close;
       SQL.Text := format(sqlDelete, [id]);
-      ExecSQL;
+      Execute;
     end;
   finally
     qMedical_card.Open();
@@ -98,13 +103,16 @@ end;
 
 procedure TdmCardList.init;
 begin
+  //open main list
   openMedical_card;
 end;
 
 procedure TdmCardList.openMedical_card;
+{ open full list of medical cards }
 var
   id: integer;
 begin
+  // remember position in the grid
   if qMedical_card.Active and (qMedical_card.RecordCount > 0) then
     id := qMedical_cardid.Value
   else
@@ -122,6 +130,7 @@ end;
 
 procedure TdmCardList.qMedical_cardCalcFields(DataSet: TDataSet);
 begin
+  // FIO as Surname N.Pn. for the grid
   qMedical_cardfio.Value := format('%s %s%s',
                             [IfThen(qMedical_cardlast_name.Value <> '', qMedical_cardlast_name.Value),
                              IfThen((qMedical_cardfirst_name.Value <> ''), qMedical_cardfirst_name.Value.Substring(0, 1)+'.'),

@@ -25,8 +25,6 @@ object fmCardList: TfmCardList
     TabOrder = 0
     Properties.ActivePage = cxTabSheet1
     Properties.CustomButtons.Buttons = <>
-    ExplicitTop = 57
-    ExplicitHeight = 454
     ClientRectBottom = 381
     ClientRectLeft = 4
     ClientRectRight = 968
@@ -35,7 +33,6 @@ object fmCardList: TfmCardList
       Tag = -2
       Caption = #1057#1087#1080#1089#1086#1082' '#1082#1072#1088#1090
       ImageIndex = 0
-      ExplicitHeight = 426
       object cxGrid1: TcxGrid
         Left = 0
         Top = 0
@@ -43,7 +40,6 @@ object fmCardList: TfmCardList
         Height = 357
         Align = alClient
         TabOrder = 0
-        ExplicitHeight = 426
         object cxGrid1DBTableView1: TcxGridDBTableView
           Navigator.Buttons.CustomButtons = <>
           Navigator.Buttons.First.Visible = True
@@ -179,7 +175,7 @@ object fmCardList: TfmCardList
     Width = 353
     Height = 74
     BevelOuter = bvNone
-    TabOrder = 6
+    TabOrder = 2
     object edFIO: TcxMRUEdit
       Left = 110
       Top = 2
@@ -254,7 +250,7 @@ object fmCardList: TfmCardList
             ImageIndex = 4
           end
           item
-            Action = aExit
+            Action = aClose
             ImageIndex = 5
           end>
       end
@@ -284,10 +280,10 @@ object fmCardList: TfmCardList
       ImageIndex = 2
       OnExecute = aDeleteExecute
     end
-    object aExit: TAction
-      Caption = #1042#1099#1093#1086#1076
+    object aClose: TAction
+      Caption = #1047#1072#1082#1088#1099#1090#1100
       ImageIndex = 5
-      OnExecute = aExitExecute
+      OnExecute = aCloseExecute
     end
     object aSave: TAction
       Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100
@@ -336,14 +332,18 @@ object fmCardList: TfmCardList
         end
         item
           Visible = True
-          ItemName = 'dxEditCard'
+          ItemName = 'dxLargeEdit_card'
         end
         item
           Visible = True
           ItemName = 'dxDelete_card'
+        end
+        item
+          Visible = True
+          ItemName = 'dxCardClose'
         end>
-      OneOnRow = True
-      Row = 1
+      OneOnRow = False
+      Row = 0
       UseOwnFont = False
       Visible = True
       WholeRow = False
@@ -351,7 +351,7 @@ object fmCardList: TfmCardList
     object dxBarManager1Bar2: TdxBar
       Caption = #1057#1086#1093#1088#1072#1085#1077#1085#1080#1077
       CaptionButtons = <>
-      DockedLeft = 184
+      DockedLeft = 246
       DockedTop = 0
       FloatLeft = 1000
       FloatTop = 2
@@ -362,7 +362,7 @@ object fmCardList: TfmCardList
           Visible = True
           ItemName = 'dxLargeSave_card'
         end>
-      OneOnRow = True
+      OneOnRow = False
       Row = 0
       UseOwnFont = False
       Visible = True
@@ -410,6 +410,14 @@ object fmCardList: TfmCardList
     end
     object dxLargeSave_card: TdxBarLargeButton
       Action = aSave
+      Category = 0
+    end
+    object dxCardClose: TdxBarButton
+      Action = aClose
+      Category = 0
+    end
+    object dxLargeEdit_card: TdxBarLargeButton
+      Action = aEdit
       Category = 0
     end
     object dxFilterPanel: TdxBarControlContainerItem

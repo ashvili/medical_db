@@ -1,5 +1,8 @@
 unit frameCardEditUnit;
-
+{
+class for the medical card
+inserting inplace pagecontrol
+}
 interface
 
 uses
@@ -68,6 +71,7 @@ implementation
 { TframeCardEdit }
 
 function TframeCardEdit.checkFill: boolean;
+// check filling main fields - name, surname, birthdate and gender
 begin
   result := edLast_name.ValidateEdit(true)
             and edFirst_name.ValidateEdit(true)
@@ -80,10 +84,13 @@ constructor TframeCardEdit.Create(AOwner: TComponent; AParent: TWinControl;
 begin
   inherited Create(AOwner);
   Fmedical_card_id := medical_card_id;
+  //procedure for close this page in the owner control
   FProcedureClose := procedureClose;
   Fdm := TdmCardEdit.Create(self, medical_card_id);
   Fdm.load;
+  //updating datasource links to the created datamodule
   updateDateBinding;
+  //insert into page, panel, etc
   if(Assigned(AParent)) then begin
     Parent:=AParent;
     Align:=alClient;
@@ -135,6 +142,7 @@ begin
 end;
 
 function TframeCardEdit.save: boolean;
+{ checking and save card, in case of success, close page }
 begin
   result := checkFill and Fdm.save;
   if result then
@@ -142,6 +150,7 @@ begin
 end;
 
 procedure TframeCardEdit.updateDateBinding;
+{ update datasources link }
 begin
   edPatient_state.DataBinding.DataSource := Fdm.dsqMedical_card;
   edFirst_name.DataBinding.DataSource := Fdm.dsqMedical_card;

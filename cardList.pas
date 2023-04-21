@@ -1,5 +1,7 @@
 unit cardList;
 
+{ main form for use list of medical cards }
+
 interface
 
 uses
@@ -35,7 +37,7 @@ type
     aEdit: TAction;
     aNew: TAction;
     aDelete: TAction;
-    aExit: TAction;
+    aClose: TAction;
     aSave: TAction;
     dxBarManager1: TdxBarManager;
     dxBarPopupMenu1: TdxBarPopupMenu;
@@ -61,6 +63,8 @@ type
     edPatient_state: TcxLookupComboBox;
     edGender: TcxLookupComboBox;
     cxGrid1DBTableView1state_name: TcxGridDBColumn;
+    dxCardClose: TdxBarButton;
+    dxLargeEdit_card: TdxBarLargeButton;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure aFilterApplyExecute(Sender: TObject);
@@ -68,7 +72,7 @@ type
     procedure aNewExecute(Sender: TObject);
     procedure aDeleteExecute(Sender: TObject);
     procedure aSaveExecute(Sender: TObject);
-    procedure aExitExecute(Sender: TObject);
+    procedure aCloseExecute(Sender: TObject);
     procedure cxGrid1DBTableView1CellDblClick(Sender: TcxCustomGridTableView;
       ACellViewInfo: TcxGridTableDataCellViewInfo; AButton: TMouseButton;
       AShift: TShiftState; var AHandled: Boolean);
@@ -88,7 +92,7 @@ type
     procedure deleteMedical_card;
     procedure saveMedical_card;
 
-    procedure closeList;
+    procedure closeCard;
 
     procedure filterApply;
   public
@@ -106,6 +110,7 @@ uses dmCardListUnit, StrUtils, dmMainUnit, sqlGenerateUnit,
   frameCardEditUnit;
 
 procedure TfmCardList.addPage(medical_card_id: integer);
+{ insert new page to pageControl component }
 var
   newTab: TcxTabSheet;
 begin
@@ -131,9 +136,9 @@ begin
   editMedical_card;
 end;
 
-procedure TfmCardList.aExitExecute(Sender: TObject);
+procedure TfmCardList.aCloseExecute(Sender: TObject);
 begin
-  closeList;
+  closeCard;
 end;
 
 procedure TfmCardList.aNewExecute(Sender: TObject);
@@ -147,6 +152,7 @@ begin
 end;
 
 procedure TfmCardList.aFilterApplyExecute(Sender: TObject);
+{ apply the filter - check and uncheck button }
 begin
   if dxFilterApply.Down then
     filterApply
@@ -154,17 +160,20 @@ begin
     showMedical_card;
 end;
 
-procedure TfmCardList.closeList;
+procedure TfmCardList.closeCard;
+{ close current page, except list of medical cards }
 begin
-  if MessageDlg('Вы действительно хотите закрыть программу?', mtConfirmation, mbYesNo, 0) = mrYes then
-    Close;
+  if cxPG.ActivePage.Tag <> -2 then // the main page with CardList
+    closePage(cxPG.ActivePage.Tag);
 end;
 
 function TfmCardList.closePage(medical_card_id: integer): boolean;
+{ function for close page by card id,
+  call from within edit-card component }
 var
   i: integer;
 begin
-  i := findPage(medical_card_id);
+  i := findPage(medical_card_id);   // search index of page
   if i >= 0 then
     cxPG.Pages[i].Free;
 end;
@@ -177,6 +186,9 @@ begin
 end;
 
 procedure TfmCardList.deleteMedical_card;
+{ delete current medical card,
+  if opened edit-card page, delete this record,
+  otherwise selected record from grid }
 var
   i: integer;
   id: integer;
@@ -186,45 +198,49 @@ begin
       if MessageDlg('Удалить карту?', mtConfirmation, mbOKCancel, 0) <> mrOK then
         Exit;
 
-      if cxPG.ActivePage.Tag = -1 then begin
+      if cxPG.ActivePage.Tag = -1 then begin // new card, not need delete from DB, just close page
         cxPG.ActivePage.Free;
         cxPG.ActivePageIndex := 0;
         Exit;
       end;
 
-      if cxPG.ActivePage.Tag >= 0 then begin
-        id := cxPG.ActivePage.Tag;
+      if cxPG.ActivePage.Tag >= 0 then begin // if open edit-card page, take index of page and id card
+        id := cxPG.ActivePage.Tag;           // page's tag == medical_card_id
         i := cxPG.ActivePageIndex;
       end
       else begin
-        id := qMedical_cardid.Value;
-        i := findPage(id);
+        id := qMedical_cardid.Value;        // use current selection
+        i := findPage(id);                  // search page's index, if somewhere opened
       end;
-      if (i < 0) or TframeCardEdit(getCard(i)).save then begin
-        delete(id);
-        cxPG.ActivePageIndex := 0;
-      end;
+      if i >= 0 then
+        cxPG.Pages[i].Free;                 // close page
+      delete(id);                           // delete from DB
+      cxPG.ActivePageIndex := 0;
     end;
   end;
 end;
 
 procedure TfmCardList.editMedical_card;
+{ open page for edit card }
 var
   i: integer;
 begin
   with dmCardList do begin
     if qMedical_card.Active and (qMedical_card.RecordCount > 0) then begin
-      i := findPage(qMedical_cardid.Value);
+      i := findPage(qMedical_cardid.Value); // may be already edited
       if i >= 0 then
-        cxPG.ActivePageIndex := i
+        cxPG.ActivePageIndex := i           // if found, activate
       else begin
-        addPage(qMedical_cardid.Value);
+        addPage(qMedical_cardid.Value);     // open new
       end;
     end;
   end;
 end;
 
 procedure TfmCardList.filterApply;
+{ filter by conditions
+  it was not possible to implement beautifully through the datamodule
+  that's why it's so hard and here }
 var
   fio: string;
   gender_id, patient_state_id: integer;
@@ -261,6 +277,8 @@ begin
 end;
 
 function TfmCardList.findPage(medical_card_id: integer): integer;
+{ find page by card id,
+  return page index }
 Var
   i: integer;
 begin
@@ -281,15 +299,18 @@ end;
 
 procedure TfmCardList.FormCreate(Sender: TObject);
 begin
+  // initialize variable for close procedure
   FProcedureClose := closePage;
 end;
 
 procedure TfmCardList.FormShow(Sender: TObject);
 begin
+  // open main table
   dmCardList.init;
 end;
 
 function TfmCardList.getCard(index: integer): TControl;
+{ find and get pointer to card control (form/frame) by page index }
 var
   i: integer;
 begin
@@ -302,17 +323,20 @@ begin
 end;
 
 procedure TfmCardList.newMedical_card;
+{ open page for edit existing or new card,
+  if already opened, activate that page }
 var
   i: integer;
 begin
   i := findPage(-1);
   if i >= 0 then
-    cxPG.ActivePageIndex := i    
+    cxPG.ActivePageIndex := i
   else
     addPage(-1);
 end;
 
 procedure TfmCardList.saveMedical_card;
+{ save changes }
 var
   card: TControl;
 begin

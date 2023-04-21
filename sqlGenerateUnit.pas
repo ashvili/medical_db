@@ -1,20 +1,22 @@
 unit sqlGenerateUnit;
-
+{
+helper for create sql-queries for insert, update, filtering
+}
 interface
 
 uses System.Classes, Data.DB, FireDAC.Comp.Client;
 
 type
 
-  { insert, update }
+  { base class for insert, update operations }
   TSQLGenerate = class
   private
     FTable_name: string;
-    FFields: TStringList;
-    FFieldsNotUsed: string;
+    FFields: TStringList;   // list of fields for update/insert
+    FFieldsNotUsed: string; // fields from input field-list, which should be excluded
 
     function canUseField(field_name: string): boolean;
-    function getSQLText: string; virtual; abstract;
+    function getSQLText: string; virtual; abstract; // result text for query
   public
     constructor Create(table_name: string; fields: TFields; fieldsNotUsed: string = '');
     destructor Free;
@@ -23,9 +25,10 @@ type
   end;
 
 
+  { use - qQueryInsert.SQL.Text := TSQLGenerate.Create('table_name', fields).SQLText; }
   TSQLGenerateInsert = class(TSQLGenerate)
   private
-    function getSQLText: string; override;
+    function getSQLText: string; override; // query for insert
   end;
 
 
@@ -35,8 +38,8 @@ type
   end;
 
 
-  {Update table}
-
+  {Update table class
+   base class for update table in DB from table-in-memory }
   TTableUpdate = class
   private
     Fquery: TFDQuery;
@@ -46,9 +49,10 @@ type
   public
     constructor Create(connection: TFDConnection; table_name: string; afields: TFields; fieldsNotUsed: string = '');
     destructor Free;
-    procedure execSQL;
+    procedure Execute;
   end;
 
+  {use - TTableUpdateInsert.Create(FDConnection, 'table_name', table.Fields).Execute }
   TTableUpdateInsert = class(TTableUpdate)
   private
     procedure initializeSQLText(table_name: string; fields: TFields; fieldsNotUsed: string); override;
@@ -59,15 +63,16 @@ type
     procedure initializeSQLText(table_name: string; fields: TFields; fieldsNotUsed: string); override;
   end;
 
-  { condition }
+  { generate condition-string for queries }
   TConditionType = (ctEq, ctIn, ctLike);
   TConnectionType = (ctAnd, ctOr);
 
+  { class for the item of list of conditions }
   TValue = class
   private
-    Fvalue: variant;
-    Fcondition: TConditionType;
-    Fconnection: TConnectionType;
+    Fvalue: variant;               // value for condition
+    Fcondition: TConditionType;    // =, like, etc
+    Fconnection: TConnectionType;  // between conditions (and, or)
 
     function getConditionStr: string;
     function getConnectionStr: string;
@@ -77,17 +82,18 @@ type
     property connection: string read getConnectionStr;
 
     constructor Create(value: variant; condition: TConditionType; connection: TConnectionType);
-
-
   end;
 
+  { class for generate condition-string
+    like "(field1 = 1) and (field2 like '%str%') and (field3 in (1, 2, 3)" ) }
+  { this class is not full completed }
   TSQLCondition = class
   private
     FsqlSelect: string;
     FConditions: TStringList;
     FSQLText: string;
 
-    function getSQLText: string;
+    function getSQLText: string;  // result string
   public
     property SQLText: string read getSQLText;
 
@@ -105,10 +111,11 @@ uses System.SysUtils, StrUtils, Variants;
 
 
 function TSQLGenerate.canUseField(field_name: string): boolean;
+{ test for usable field }
 begin
-  result := (field_name.ToLower <> 'recid') and   // excude dxMemTable service field
-            (field_name.ToLower <> 'id') and      // and autoincremental id
-            (Pos(format('"%s"', [field_name.ToLower]),
+  result := (field_name.ToLower <> 'recid') and        // excude dxMemTable service field
+            (field_name.ToLower <> 'id') and           // and autoincremental id
+            (Pos(format('"%s"', [field_name.ToLower]), // and for fieldsnotsued
               FFieldsNotUsed.ToLower) = 0);
 end;
 
@@ -119,6 +126,7 @@ var
 begin
   FTable_name := table_name;
   FFieldsNotUsed := fieldsNotUsed;
+  // fill the fields-list
   if Assigned(fields) and (fields.Count > 0) then begin
     FFields := TStringList.Create;
     for f in fields do
@@ -190,11 +198,13 @@ constructor TTableUpdate.Create(connection: TFDConnection; table_name: string; a
 var
   i: integer;
 begin
+  // create text for sql
   initializeSQLText(table_name, afields, fieldsNotUsed);
   Fquery := TFDQuery.Create(nil);
   Fquery.Connection := connection;
   with Fquery do begin
     SQL.Text := FSQLText;
+    // fill the parameters TDquery from input fields
     for i := 0 to afields.Count -1 do begin
       if FindParam(afields[i].FieldName) <> nil then begin
         with ParamByName(afields[i].FieldName) do begin
@@ -207,7 +217,7 @@ begin
   end;
 end;
 
-procedure TTableUpdate.execSQL;
+procedure TTableUpdate.Execute;
 begin
   if Assigned(Fquery) then
     Fquery.ExecSQL;
@@ -242,6 +252,7 @@ end;
 { TSQLCondition }
 
 function TSQLCondition.addAnd(field, value: string;
+// add the condition 'AND' to the chain
   condition: TConditionType): TSQLCondition;
 var
   v: TValue;
@@ -253,6 +264,7 @@ end;
 
 function TSQLCondition.addOr(field, value: string;
   condition: TConditionType): TSQLCondition;
+// add the condition 'OR' to the chain
 var
   v: TValue;
 begin

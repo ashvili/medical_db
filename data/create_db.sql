@@ -1,0 +1,1 @@
+CREATE DATABASE "medical_db"  WITH OWNER "postgres" ENCODING 'UTF8';
